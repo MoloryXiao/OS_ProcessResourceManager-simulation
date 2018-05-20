@@ -15,3 +15,5 @@ class NewPCB(object):
         self.cpuState = None
         self.memory = None
         self.openFiles = None
+    def print(self):
+        print("%s[%d]"%(self.pid,self.prio))
