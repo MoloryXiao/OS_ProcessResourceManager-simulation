@@ -5,15 +5,15 @@ Created on 2018年5月17日
 '''
 
 class NewPCB(object):
-    def __init__(self, PID , Prio):
+    def __init__(self, PID , Prio, Status):
         self.pid = PID
         self.prio = Prio
         self.childTree = []
         self.resources = []
-        self.status = None
+        self.status = Status
         self.parent = None
         self.cpuState = None
         self.memory = None
         self.openFiles = None
     def print(self):
-        print("%s[%d]"%(self.pid,self.prio))
+        print("%s[%s]"%(self.pid,self.status))

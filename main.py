@@ -3,25 +3,14 @@ Created on 2018年5月17日
 
 @author: Murrey
 '''
-from Process import ProcessManager
-from PCB import NewPCB
+from Core import CoreManager
 
 if __name__ == '__main__':
-    procManager = ProcessManager()
+    coreMan =  CoreManager()
     while(True):
-        message = input("【Please input your command】")
+        message = input("*** Please input your command：")
         message = message.split(' ')
-        if message[0] == "cr":
-            l_pid = message[1]
-            l_prio = int(message[2])
-            procManager.createProcess(l_pid, l_prio)
-        elif message[0] == "de":
-            l_pid = message[1]
-            procManager.destoryProcess(l_pid)
-        elif message[0] == "list":
-            procManager.printReadyList()
-        elif message[0] == "break":
+        res = coreMan.decodeInstruction(message)
+        if res == False:
             break
-        else:
-            print("Please check your command.")
         
