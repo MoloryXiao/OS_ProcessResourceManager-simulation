@@ -6,11 +6,11 @@ Created on 2018年5月17日
 from Core import CoreManager
 
 if __name__ == '__main__':
-    coreMan =  CoreManager()
+    coreManager =  CoreManager()
     while(True):
-        message = input("*** Please input your command：")
+        message = input("Shell/murrey > ")
         message = message.split(' ')
-        res = coreMan.decodeInstruction(message)
+        res = coreManager.decodeInstruction(message)
         if res == False:
             break
         

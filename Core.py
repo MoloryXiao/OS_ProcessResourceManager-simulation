@@ -60,7 +60,13 @@ class CoreManager(object):
     def createResource(self,message):
         rid = message[1]
         num = int(message[2])
-        self.__resManager.createResource(rid, num)
+        result = self.__resManager.createResource(rid, num)
+        if result == "ErrorNum":            
+            print("Error: can not create resource with num=0")
+        elif result == "ErrorRid":            
+            print("Error: create resource error.Rid has existed.")
+        else:
+            print("Success: create %s with the quantity=%d"%(rid,num))
     
     # 销毁进程
     def destoryProcess(self,message):
@@ -130,10 +136,3 @@ class CoreManager(object):
             pass
         else: # 将唤醒的进程加入就绪队列 并重新进行调度
             self.__procManager.anyPcbInReadyList(rnResult,True)
-            
-            
-            
-            
-            
-            
-            

@@ -4,34 +4,29 @@ Created on 2018年5月19日
 @author: Murrey
 '''
 from RCB import NewRcb
-from Item import NewWaitingListItem
-from Item import NewUsingListItem
-from Item import NewBlockingListItem
-from Item import NewResourceItem
+from Item import *
 
 class ResourceManager(object):
     def __init__(self,readyList):
         self.__readyList = readyList
         self.__blockingList = []
         self.__resourceList = []
-    
-    def getResource(self,rid):
-        listLen = self.__resourceList.__len__()
-        for i in range(listLen):
-            if self.__resourceList[i].rid == rid:
-                return self.__resourceList[i]
-        return False
-        
+
+    ####
+    # 函数功能：根据提供的RID和资源数量num 创建一个资源并加入资源列表中
+    ####
     def createResource(self,rid,num):
         if num == 0:
-            print("Error: can not create resource with num=0")
-            return
+            return "ErrorNum"
         if self.getResource(rid) != False:
-            print("Error: create resource error.Rid has existed.")
-            return
+            return "ErrorRid"
         newRcb = NewRcb(rid,num)
         self.__resourceList.append(newRcb)
+        return True
     
+    ####
+    # 函数功能：任务请求给定数量的资源
+    ####
     def requestResource(self,pcb,rid,num):
         res = self.getResource(rid)
         
@@ -40,14 +35,14 @@ class ResourceManager(object):
         if res.sum < num:   # 判断资源申请数是否不超出资源本身最大值
             return "ErrorNum"
         
-        # 若小于或等于，则创建资源使用块，加入该资源的使用队列中
-        # 返回申请到的资源
-        if res.available >= num:                 
+        # 合法申请或阻塞等待
+        if res.available >= num: 
+            # 若小于或等于，则创建资源使用块，加入该资源的使用队列中     
             usingItem = NewUsingListItem(pcb,num)   
             res.usingList.append(usingItem)
             res.available -= num
             rnResource = NewResourceItem(res.rid,num)            
-            return rnResource
+            return rnResource   # 返回申请到的资源
         else:    
             # 创建等待块，加入该资源的等待队列
             # 创建阻塞块，加入资源管理器的阻塞队列
@@ -57,10 +52,10 @@ class ResourceManager(object):
             res.waitingList.append(waitingItem)
             self.__blockingList.append(blockingItem)
             return "Blocking"
-    '''
-    1. 将 pcb从该rcb的使用者队列中移除
-    2. 检查阻塞队列  检查是否可进行资源分配 
-    '''
+    
+    ####   
+    # 函数功能：进程释放给定数量的资源 并给定标志位标识是否执行唤醒操作
+    ####
     def releaseResource(self,pcb,rid,releaseNum,isCheckWaitingList):
         res = self.getResource(rid)
         if res == False:    # 判断资源是否存在
@@ -68,7 +63,7 @@ class ResourceManager(object):
         if res.isPcbExistInUsingList(pcb) == False:    # 判断释放资源的进程是否在该资源下
             return "ErrorPid"
         
-        item = res.getPcbFromUsingList(pcb)
+        item = res.getItemFromUsingList(pcb)
         if item.num < releaseNum:       # 判断是否非法释放
             return "ErrorReleaseNum"
         
@@ -111,20 +106,9 @@ class ResourceManager(object):
         else:
             return "Success"
     
-    def printAllResource(self):
-        listLen = self.__resourceList.__len__()
-        print("\nResource Counts：%d"%listLen)
-        print("==========ResourceList==========")
-        for i in range(listLen):
-            self.__resourceList[i].print()
-        print("==========ResourceList==========")
-        
-    def getItemFromBlockingList(self,pcb):
-        for i in range(self.__blockingList.__len__()):
-            if self.__blockingList[i].pcb == pcb:
-                return self.__blockingList[i]
-        return False
-    
+    ####
+    #  函数功能：释放给定PCB列表中所有PCB的资源 并且不引起重新调度
+    ####
     def releasePcbListResource(self,pcbList):
         # 释放所有进程所持有的资源 但不引起重新调度
         listLen = pcbList.__len__()
@@ -150,7 +134,40 @@ class ResourceManager(object):
             else:
                 continue
         return True
+
+    ####
+    # 函数功能：查看PCB是否存在于阻塞队列中 若存在则返回该阻塞项 
+    ####
+    def getItemFromBlockingList(self,pcb):
+        for i in range(self.__blockingList.__len__()):
+            if self.__blockingList[i].pcb == pcb:
+                return self.__blockingList[i]
+        return False
     
+    ####
+    # 函数功能：根据提供的RID 从资源列表中得到该资源 并返回
+    ####
+    def getResource(self,rid):
+        listLen = self.__resourceList.__len__()
+        for i in range(listLen):
+            if self.__resourceList[i].rid == rid:
+                return self.__resourceList[i]
+        return False
+    
+    ####
+    # 函数功能：打印所有资源的情况
+    ####
+    def printAllResource(self):
+        listLen = self.__resourceList.__len__()
+        print("\nResource Counts：%d"%listLen)
+        print("==========ResourceList==========")
+        for i in range(listLen):
+            self.__resourceList[i].print()
+        print("")
+        
+    ####
+    # 函数功能：打印阻塞队列情况
+    ####
     def printBlockingList(self):
         listLen = self.__blockingList.__len__()
         print("\nBlocking Item Counts：%d"%listLen)
@@ -159,6 +176,3 @@ class ResourceManager(object):
             for i in range(listLen):
                 self.__blockingList[i].print()
         print("")   # 换行
-    
-    
-    
