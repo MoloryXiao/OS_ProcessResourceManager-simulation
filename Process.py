@@ -14,6 +14,7 @@ class ProcessManager(object):
         self.__readyList = readyList
         initPcb = NewPCB("init",0,"ready")
         self.__readyList[0].append(initPcb)    # 将新进程加入对应的就绪队列
+        self.__pcbList.append(initPcb)
         self.__scheduler()    # 进程调度
     
     ####
@@ -154,7 +155,7 @@ class ProcessManager(object):
     def getProcess(self,pid):
         for i in range(self.__pcbList.__len__()):
             if self.__pcbList[i].pid == pid:
-                return self.__pcbList[i]            
+                return self.__pcbList[i]
         return False
     
     ####
